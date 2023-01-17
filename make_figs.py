@@ -43,6 +43,8 @@ check_call(cmd, shell=True)
 # =======================================================
 fig_cnt += 1
 # 1. run the notebook/script
+cmd = "./param_plots.sh"
+check_call(cmd, shell=True)
 
 # 2. assemble the panels into a publication-ready file
 cmd = 'cp figs/freedriftparameter_nh_3panels.png {}/fig{:02d}.png'.format(final_dir, fig_cnt)
@@ -57,6 +59,11 @@ check_call(cmd, shell=True)
 # =================================
 fig_cnt += 1
 # 1. run the notebook/script
+cmd = "./time_plots.sh 20150226 nh amsr2-gw1"
+check_call(cmd, shell=True)
+cmd = "./time_plots.sh 20150826 sh amsr2-gw1"
+check_call(cmd, shell=True)
+
 
 # 2. assemble the panels into a publication-ready file
 nh_files = ['figs/ice_drift_{a:}_ease2-750_amsr2-gw1_201502251200-201502261200_{t:}_simple_{a:}-ease-wide.png'.format(t=tstr,a='nh') for tstr in ('t0','t1','tdiff')]
@@ -72,6 +79,10 @@ check_call(cmd, shell=True)
 # =================================
 fig_cnt += 1
 # 1. run the notebook/script
+cmd = "./drift_plots.sh 20100117 nh multi-oi"
+check_call(cmd, shell=True)
+cmd = "./drift_plots.sh 20100814 sh multi-oi"
+check_call(cmd, shell=True)
 
 # 2. assemble the panels into a publication-ready file
 nh_files = ['figs/ice_drift_{a:}_ease2-750_cdr-v1p0_24h-201001171200_{d:}_simple_{a:}-ease-eur.png'.format(d=dstr,a='nh') for dstr in ('dX','dY',)]
