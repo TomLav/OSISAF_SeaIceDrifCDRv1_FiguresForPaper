@@ -925,6 +925,11 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
         ax.add_feature(cfeature.NaturalEarthFeature('physical', 'land',
             '10m', edgecolor='black', facecolor=col_land, linewidth=0.2))
         if hemi == 'sh':
+            # Fixing the weird line from the South Pole
+            x0, y0 = plot_crs.transform_point(180., -90., src_crs=pc)
+            x1, y1 = plot_crs.transform_point(180., -78.1, src_crs=pc)
+            ax.plot([x0, x1], [y0, y1], color=col_land, linewidth=1.5)
+            # Ice shelves
             ax.add_feature(cfeature.NaturalEarthFeature('physical',
                 'antarctic_ice_shelves_polys', '10m', facecolor=col_land,
                 edgecolor='black', linewidth=0.2))

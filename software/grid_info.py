@@ -5,7 +5,7 @@ valid_regions = ['polstere-wide-nh', 'polstere-nh', 'polstere-arc',
                  'polstere-dml', 'polstere-ross', 'polstere-lross',
                  'polstere-bell', 'polstere-wil',
                  'ease-nh', 'ease-nh-wide', 'ease-nh-very-wide',
-                 'ease-eur', 'ease-arc', 'ease-can',
+                 'ease-eur', 'ease-eur-trim', 'ease-arc', 'ease-can',
                  'ease-sh', 'ease-sh-wide', 'ease-sh-very-wide',
                  'ease-wed', 'ease-ross', 'ease-bell', 'ease-wil']
 
@@ -189,6 +189,17 @@ def region_params(region):
         rp['labelpos'] = 0.78
         rp['logo_left'] = 0.15
         rp['logo_bottom'] = 0.5
+    elif region == 'ease-eur-trim':
+        rp['lllat'] = 67.
+        rp['lllon'] = -25.
+        rp['urlat'] = 72.
+        rp['urlon'] = 95.
+        rp['long_name'] = 'European Arctic'
+        rp['scale'] = 5
+        rp['skip']  = 3
+        rp['labelpos'] = 0.82
+        rp['logo_left'] = 0.18
+        rp['logo_bottom'] = 0.5
     elif region == 'ease-arc':
         rp['lllat'] = 58.
         rp['lllon'] = -50.
@@ -244,8 +255,8 @@ def region_params(region):
         rp['long_name'] = 'Weddell and Lazarev Sea'
         rp['scale'] = 5
         rp['skip']  = 3
-        rp['logo_left'] = 0.68
-        rp['logo_bottom'] = 0.08
+        rp['logo_left'] = 0.52
+        rp['logo_bottom'] = 0.23
         rp['labelpos'] = 0.83
     elif region == 'ease-ross':
         rp['lllat'] = -55.0

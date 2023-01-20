@@ -48,9 +48,18 @@ def parse_args():
     p.add_argument('-p', '--param', required=True,
                    help="Parameter to plot")
     p.add_argument('-p2', '--param2', required=False, default=None,
-                   help="Second parameter to average with first parameter")
-    p.add_argument('-ng', '--nogeocurr', default=False,
-                   help="Don't plot the geostrophic current arrows")
+                   help="Second parameter to average or mean square with first "
+                   "parameter")
+    p.add_argument('-s', '--meansq', action='store_true', default=False,
+                   help="Use mean square rather than averaging two params. "
+                   "This is used for speed.")
+    p.add_argument('-g', '--geocurr', action='store_true', default=False,
+                   help="Plot the geostrophic current arrows")
+    p.add_argument('--gskip', required=False,
+                   help="Skip factor to plot sparser geostrophic current "
+                   "arrows")
+    p.add_argument('--gscale', required=False, default=1,
+                   help="Scale factor for geostropic current arrows")
     p.add_argument('-o', '--outdir', required=True,
                    help="Output plot directory")
     p.add_argument('-c', '--cline', action='store_true', default=False,
@@ -96,8 +105,8 @@ def colbar_flags_discrete():
     return cmap_flags
 
 
-def plot_ncparam(infile, month, param, param2=None, nogeocurr=False,
-                 outdir='.', cline=False):
+def plot_ncparam(infile, month, param, param2=None, meansq=False,
+                 geocurr=False, gskip=None, gscale=1, outdir='.', cline=False):
 
     with Dataset(infile, 'r') as dataset:
         try:
@@ -172,19 +181,30 @@ def plot_ncparam(infile, month, param, param2=None, nogeocurr=False,
             dmask2 = dataset.variables[param2][month -1, :, :].mask
 
         # Reading in the geostrophic current info
-        lats = dataset.variables['lat'][:]
-        lons = dataset.variables['lon'][:]
         gcxvar = 'C_real_gapfill'
         gcyvar = 'C_imag_gapfill'
-        geocx = dataset.variables[gcxvar][month - 1, :, :]
-        geocxmask = dataset.variables[gcxvar][month - 1, :, :].mask
-        geocy = dataset.variables[gcyvar][month - 1, :, :]
-        geocymask = dataset.variables[gcyvar][month - 1, :, :].mask
+        if gskip is not None:
+            lats = dataset.variables['lat'][::gskip, ::gskip]
+            lons = dataset.variables['lon'][::gskip, ::gskip]
+            geocx = dataset.variables[gcxvar][month - 1, ::gskip, ::gskip]
+            geocxmask = dataset.variables[gcxvar][month - 1, ::gskip, ::gskip].mask
+            geocy = dataset.variables[gcyvar][month - 1, ::gskip, ::gskip]
+            geocymask = dataset.variables[gcyvar][month - 1, ::gskip, ::gskip].mask
+        else:
+            lats = dataset.variables['lat'][:]
+            lons = dataset.variables['lon'][:]
+            geocx = dataset.variables[gcxvar][month - 1, :, :]
+            geocxmask = dataset.variables[gcxvar][month - 1, :, :].mask
+            geocy = dataset.variables[gcyvar][month - 1, :, :]
+            geocymask = dataset.variables[gcyvar][month - 1, :, :].mask
         # If the parameter file should not be gapfilled, then we want
         # to use the flags to reduce the number of geostrophic current
         # vectors
         if not 'gapfill' in param:
-            flags = dataset.variables['flags'][month - 1, :, :]
+            if gskip is not None:
+                flags = dataset.variables['flags'][month - 1, ::gskip, ::gskip]
+            else:
+                flags = dataset.variables['flags'][month - 1, :, :]
             geocxmask[flags != 0] = 1
             geocymask[flags != 0] = 1
 
@@ -218,8 +238,15 @@ def plot_ncparam(infile, month, param, param2=None, nogeocurr=False,
 
         # If the second parameter is set, average these
         if param2 is not None:
-            data = np.mean(np.array([data, data2]), axis=0)
-            data = np.ma.array(data)
+            if meansq:
+                dsq = data * data
+                d2sq = data2 * data2
+                datasq = dsq + d2sq
+                data = np.sqrt(datasq)
+                data = np.ma.array(data)
+            else:
+                data = np.mean(np.array([data, data2]), axis=0)
+                data = np.ma.array(data)
 
         if param != 'flags':
             data[dmask] = np.nan
@@ -267,11 +294,19 @@ def plot_ncparam(infile, month, param, param2=None, nogeocurr=False,
         data_cmap_lvl  = [-0.02, -0.01, 0.0, 0.01, 0.02, 0.03, 0.04, 0.05]
         norm = colors.TwoSlopeNorm(vmin=-0.05, vcenter=0, vmax=vmax)
     if param in  ['C_real', 'C_imag', 'C_real_gapfill', 'C_imag_gapfill']:
-        datacmap = cmocean.cm.balance
-        vmin = -0.06
-        vmax = 0.06
-        data_cmap_lvl  = [-0.06, -0.03, 0.0, 0.03, 0.06]
-        norm = colors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
+        # Speed rather than x- or y- component
+        if param2 is not None:
+            datacmap = cmocean.cm.haline
+            vmin = 0.0
+            vmax = 0.08
+            data_cmap_lvl  = [0, 0.02, 0.04, 0.06, 0.08]
+            norm = None
+        else:
+            datacmap = cmocean.cm.balance
+            vmin = -0.06
+            vmax = 0.06
+            data_cmap_lvl  = [-0.06, -0.03, 0.0, 0.03, 0.06]
+            norm = colors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
     if param in  ['RMS_Res_real', 'RMS_Res_imag']:
         datacmap = cmocean.cm.haline
         vmin = 0.0
@@ -298,7 +333,7 @@ def plot_ncparam(infile, month, param, param2=None, nogeocurr=False,
             data_cmap_lvl  = [-20, -10, 0, 10, 20, 30, 40, 50, 60]
             norm = None
             inv_yax = True
-            datacmap = cmap_norm_to_lims(cmocean.cm.balance_r, -60, 60,
+            datacmap = cmap_norm_to_lims(cmocean.cm.balance, -60, 60,
                                          vmin, vmax)
     if param in  ['lon']:
         datacmap = cmocean.cm.balance
@@ -345,9 +380,10 @@ def plot_ncparam(infile, month, param, param2=None, nogeocurr=False,
                          norm=norm, interpolation='none')
 
     # Plotting the geostrophic currents
-    if not nogeocurr:
+    if geocurr:
         pc = ccrs.PlateCarree()
-        scale = 5000000
+        exscale = 1000000
+        scale = exscale * gscale
         for i in range(geocx.size):
             try:
                 # This was plot_crs
@@ -383,9 +419,9 @@ def plot_ncparam(infile, month, param, param2=None, nogeocurr=False,
                     head_length = 0.3 * scale * len_arrow
                     plt.arrow(x0, y0, pdx, pdy, color='black',
                               shape='full', head_length=head_length,
-                              head_width=15000,
+                              head_width=0.005 * scale,
                               fill=True, length_includes_head=True,
-                              width=4000)
+                              width=0.001 * scale)
 
             except:
                 pass # Outside the range of points
@@ -433,11 +469,18 @@ def main():
     month = int(args.month)
     param = args.param
     param2 = args.param2
-    nogeocurr = args.nogeocurr
+    meansq = args.meansq
+    geocurr = args.geocurr
+    if args.gskip:
+        gskip = int(args.gskip)
+    else:
+        gskip = None
+    gscale = int(args.gscale)
     outdir = args.outdir
     cline = args.cline
 
-    plot_ncparam(infile, month, param, param2=param2, nogeocurr=nogeocurr,
+    plot_ncparam(infile, month, param, param2=param2, meansq=meansq,
+                 geocurr=geocurr, gskip=gskip, gscale=gscale,
                  outdir=outdir, cline=cline)
 
 
