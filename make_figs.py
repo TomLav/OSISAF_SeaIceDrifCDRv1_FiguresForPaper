@@ -113,7 +113,7 @@ rdate = {'nh': datetime.strptime('20100117', '%Y%m%d'),
 reg = {'nh': 'ease-eur-trim',
        'sh': 'ease-wed'}
 sens = 'multi-oi'
-for hemi in ['nh']:#, 'sh']:
+for hemi in ['nh', 'sh']:
     if sens != 'multi-oi':
         fname = "https://thredds.met.no/thredds/dodsC/osisaf/met.no/reprocessed/ice/drift_455m_files/single_sensor/{}/{:%Y}/{:%m}/ice_drift_{}_ease2-750_cdr-v1p0-{}_24h-{:%Y%m%d}1200.nc".format(sens, rdate[hemi], rdate[hemi], hemi, sens, rdate[hemi])
     else:
