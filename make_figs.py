@@ -59,10 +59,10 @@ cmd = "python software/plot_ncparam.py -i https://thredds.met.no/thredds/dodsC/m
 check_call(cmd, shell=True)
 
 # 2. assemble the panels into a publication-ready file
-cmd = "montage -label '(a) |A| parameter (gapfilled)' figs/inv_params_osi455_nh_200301-202012_1day_jul_absA_gapfill.png -label '(b) Turning angle' figs/inv_params_osi455_nh_200301-202012_1day_jul_ThetaA_gapfill.png -label '(c) Geostrophic current' figs/inv_params_osi455_nh_200301-202012_1day_jul_C_real_gapfill_C_imag_gapfill.png -tile 3x1 -geometry '622x586>+5+5' -pointsize 23 figs/freedriftparameter_nh_3panels.png"
+cmd = "montage -label '(a) |A|' figs/inv_params_osi455_nh_200301-202012_1day_jul_absA_gapfill.png -label '(b) Turning angle' figs/inv_params_osi455_nh_200301-202012_1day_jul_ThetaA_gapfill.png -label '(c) Geostrophic current' figs/inv_params_osi455_nh_200301-202012_1day_jul_C_real_gapfill_C_imag_gapfill.png -tile 3x1 -geometry '622x586>+5+5' -pointsize 23 figs/freedriftparameter_nh_3panels.png"
 check_call(cmd, shell=True)
 
-cmd = "montage -label '(a) |A| parameter (gapfilled)' figs/inv_params_osi455_sh_200208-202007_1day_dec_absA_gapfill.png -label '(b) Turning angle' figs/inv_params_osi455_sh_200208-202007_1day_dec_ThetaA_gapfill.png -label '(c) Geostrophic current' figs/inv_params_osi455_sh_200208-202007_1day_dec_C_real_gapfill_C_imag_gapfill.png -tile 3x1 -geometry '622x559>+5+5' -pointsize 23 figs/freedriftparameter_sh_3panels.png"
+cmd = "montage -label '(a) |A|' figs/inv_params_osi455_sh_200208-202007_1day_dec_absA_gapfill.png -label '(b) Turning angle' figs/inv_params_osi455_sh_200208-202007_1day_dec_ThetaA_gapfill.png -label '(c) Geostrophic current' figs/inv_params_osi455_sh_200208-202007_1day_dec_C_real_gapfill_C_imag_gapfill.png -tile 3x1 -geometry '622x559>+5+5' -pointsize 23 figs/freedriftparameter_sh_3panels.png"
 check_call(cmd, shell=True)
 
 cmd = 'cp figs/freedriftparameter_nh_3panels.png {}/fig{:02d}.png'.format(final_dir, fig_cnt)
