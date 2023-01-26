@@ -339,19 +339,19 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
         norm = None
     if param in  ['ThetaA', 'ThetaA_gapfill']:
         if hemi == 'nh':
-            vmin = -60.
-            vmax = 20
-            data_cmap_lvl  = [-60, -50, -40, -30, -20, -10, 0, 10, 20]
+            vmin = -40.
+            vmax = 10
+            data_cmap_lvl  = np.arange(vmax, vmin-0.01,-10)
             norm = None
-            datacmap = cmap_norm_to_lims(cmocean.cm.balance, -60, 60, 
+            datacmap = cmap_norm_to_lims(cmocean.cm.balance, -40, 40, 
                                          vmin, vmax)
         else:
-            vmin = -20
-            vmax = 60.
-            data_cmap_lvl  = [-20, -10, 0, 10, 20, 30, 40, 50, 60]
+            vmin = -10
+            vmax = 40.
+            data_cmap_lvl  = np.arange(vmin, vmax+0.01,10)
             norm = None
             inv_yax = True
-            datacmap = cmap_norm_to_lims(cmocean.cm.balance, -60, 60,
+            datacmap = cmap_norm_to_lims(cmocean.cm.balance, -40, 40,
                                          vmin, vmax)
     if param in  ['lon']:
         datacmap = cmocean.cm.balance
