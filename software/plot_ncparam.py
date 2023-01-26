@@ -108,6 +108,18 @@ def colbar_flags_discrete():
 def plot_ncparam(infile, month, param, param2=None, meansq=False,
                  geocurr=False, gskip=None, gscale=1, outdir='.', cline=False):
 
+    if param.endswith('_gapfill'):
+        gapfill = True
+    else:
+        param = param + '_gapfill'
+        gapfill = False
+
+    if param2 is not None:
+        if not param2.endswith('_gapfill'):
+            param2 = param2 + '_gapfill'
+
+    print("Param: {}, Param2: {}, Gapfill: {}".format(param, param2, gapfill))
+
     with Dataset(infile, 'r') as dataset:
         try:
             grid_mapping = dataset.variables[param].__dict__['grid_mapping']
@@ -200,7 +212,7 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
         # If the parameter file should not be gapfilled, then we want
         # to use the flags to reduce the number of geostrophic current
         # vectors
-        if not 'gapfill' in param:
+        if not gapfill:
             if gskip is not None:
                 flags = dataset.variables['flags'][month - 1, ::gskip, ::gskip]
             else:
@@ -284,6 +296,12 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
         if flip:
             ff = np.flip(ff, axis=0)
 
+        # if we do not want to plot the gapfilled field, mask the gapfilled cells
+        if not gapfill:
+            fmask = dataset.variables['flags'][month - 1, :, :]
+            data[fmask == 19] = np.ma.masked
+
+
     # Plotting setup
     colbar_type = 'cont'
     inv_yax = False
@@ -298,8 +316,8 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
         if param2 is not None:
             datacmap = cmocean.cm.haline
             vmin = 0.0
-            vmax = 0.08
-            data_cmap_lvl  = [0, 0.02, 0.04, 0.06, 0.08]
+            vmax = 0.05
+            data_cmap_lvl  = [0, 0.025, 0.05, ]
             norm = None
         else:
             datacmap = cmocean.cm.balance
@@ -451,12 +469,17 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
                     'antarctic_ice_shelves_polys', '10m', facecolor='grey',
                                                         edgecolor='grey'))
 
+    if not gapfill:
+        param = param.replace('_gapfill','')
+        if param2:
+            param2 = param2.replace('_gapfill','')
+
     if param2 is not None:
         param = '{}_{}'.format(param, param2)
     outbname = "{}_{}_{}.png".format(os.path.basename(infile)[:-3],
                                      month_dict[month], param)
     outname = os.path.join(outdir, outbname)
-    plt.savefig(outname, bbox_inches='tight')
+    plt.savefig(outname, bbox_inches='tight', dpi=150)
     plt.close()
     print("Figure is in {}".format(outname))
 
