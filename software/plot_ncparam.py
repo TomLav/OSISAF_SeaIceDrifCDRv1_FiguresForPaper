@@ -60,6 +60,9 @@ def parse_args():
                    "arrows")
     p.add_argument('--gscale', required=False, default=1,
                    help="Scale factor for geostropic current arrows")
+    p.add_argument('--nobg', required=False, default=False, action='store_true',
+                   help="Skip plotting the background variable and just plot "
+                   "geostrophic currents")
     p.add_argument('-o', '--outdir', required=True,
                    help="Output plot directory")
     p.add_argument('-c', '--cline', action='store_true', default=False,
@@ -106,7 +109,8 @@ def colbar_flags_discrete():
 
 
 def plot_ncparam(infile, month, param, param2=None, meansq=False,
-                 geocurr=False, gskip=None, gscale=1, outdir='.', cline=False):
+                 geocurr=False, gskip=None, gscale=1, nobg=False, outdir='.',
+                 cline=False):
 
     if param.endswith('_gapfill'):
         gapfill = True
@@ -393,9 +397,10 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
     ax.set_extent(plot_data_extent, crs=data_ccrs)
 
     # Plotting the data
-    datacbar = ax.imshow(data, cmap=datacmap, extent=mpl_data_extent,
-                         transform=data_ccrs, vmin=vmin, vmax=vmax,
-                         norm=norm, interpolation='none')
+    if not nobg:
+        datacbar = ax.imshow(data, cmap=datacmap, extent=mpl_data_extent,
+                             transform=data_ccrs, vmin=vmin, vmax=vmax,
+                             norm=norm, interpolation='none')
 
     # Plotting the geostrophic currents
     if geocurr:
@@ -449,16 +454,17 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
         cs = ax.contour(ff, [95], colors='red', linewidths=2,
                         transform=data_ccrs, extent=mpl_data_extent)
 
-    if colbar:
-        if colbar_type == 'discrete':
-            cb = plt.colorbar(datacbar, ticks=data_cmap_lvl,
-                         orientation='vertical', pad=0.05, shrink=0.8)
-            cb.ax.set_yticklabels(cmap_labs)
-            cb.set_label(colbar_label)
-        else:
-            plt.colorbar(datacbar, ticks=data_cmap_lvl,
-                         orientation='vertical', pad=0.05, shrink=0.8
-                     ).set_label(colbar_label)
+    if not nobg:
+        if colbar:
+            if colbar_type == 'discrete':
+                cb = plt.colorbar(datacbar, ticks=data_cmap_lvl,
+                                  orientation='vertical', pad=0.05, shrink=0.8)
+                cb.ax.set_yticklabels(cmap_labs)
+                cb.set_label(colbar_label)
+            else:
+                plt.colorbar(datacbar, ticks=data_cmap_lvl,
+                             orientation='vertical', pad=0.05, shrink=0.8
+                         ).set_label(colbar_label)
 
     if param != 'flags':
         ax.add_feature(cfeature.NaturalEarthFeature('physical', 'land',
@@ -499,11 +505,12 @@ def main():
     else:
         gskip = None
     gscale = int(args.gscale)
+    nobg  = args.nobg
     outdir = args.outdir
     cline = args.cline
 
     plot_ncparam(infile, month, param, param2=param2, meansq=meansq,
-                 geocurr=geocurr, gskip=gskip, gscale=gscale,
+                 geocurr=geocurr, gskip=gskip, gscale=gscale, nobg=nobg,
                  outdir=outdir, cline=cline)
 
 

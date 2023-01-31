@@ -670,10 +670,10 @@ def bg_plot_setup(bgvar=None, bgnc=None):
 
     elif bgvar in ['driftX', 'driftY', 'dX', 'dY']:
         bg['lbl'] = '{} component over 24 hours [km]'.format(bgvar)
-        bg['min'] = -30
-        bg['max'] = 30
+        bg['min'] = -50
+        bg['max'] = 50
         bg['cmap'] = cmocean.cm.balance
-        bg['cmap_lvl'] = [-30, -15, 0, 15, 30]
+        bg['cmap_lvl'] = [-50, -25, 0, 25, 50]
         bg['cmap_fmt'] = '%2i'
         bg['norm'] = matplotlib.colors.TwoSlopeNorm(vmin=bg['min'],
                                                     vcenter=0,
@@ -1115,8 +1115,12 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
             print("WARNING! No output name")
         if type(region) == str:
             name = name + '_' + region
-        foutput = os.path.basename(driftfile).replace('.nc',
-                                                  '_' + name + '.png')
+        if driftfile is not None:
+            fbasename = driftfile
+        else:
+            fbasename = bgfile
+        foutput = os.path.basename(fbasename).replace('.nc',
+                                                    '_' + name + '.png')
         output = os.path.join(output,foutput)
         print("Output file at {}".format(output))
 

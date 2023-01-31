@@ -87,11 +87,11 @@ for hemi in ['nh', 'sh']:
         fname="https://thredds.met.no/thredds/dodsC/osisaf/met.no/reprocessed/ice/drift_455m_files/merged/{:%Y}/{:%m}/ice_drift_{}_ease2-750_cdr-v1p0_24h-{:%Y%m%d}1200.nc".format(rdate[hemi], rdate[hemi], hemi, rdate[hemi])
     sdate = rdate[hemi] - timedelta(days=1)
     titlestr="{} / {:%Y-%m-%d} to {:%Y-%m-%d}".format(sens.upper(), sdate, rdate[hemi])
-    cmd = "python software/ql_figure.py -r ease-{}-wide -d {} -bg t0 -bgf {} -o figs --colbar --title --scale 20 --skip 2 --custom '{}' --inv_y".format(hemi, fname, fname, titlestr)
+    cmd = "python software/ql_figure.py -r ease-{}-wide -bg t0 -bgf {} -o figs --colbar --title --custom '{}' --inv_y".format(hemi, fname, titlestr)
     check_call(cmd, shell=True)
-    cmd = "python software/ql_figure.py -r ease-{}-wide -d {} -bg t1 -bgf {} -o figs --colbar --title --scale 20 --skip 2 --custom '{}' --inv_y".format(hemi, fname, fname, titlestr)
+    cmd = "python software/ql_figure.py -r ease-{}-wide -bg t1 -bgf {} -o figs --colbar --title --custom '{}' --inv_y".format(hemi, fname, titlestr)
     check_call(cmd, shell=True)
-    cmd = "python software/ql_figure.py -r ease-{}-wide -d {} -bg t0 -bgf {} -bg2 t1 -bgf2 {} -o figs --colbar --title --scale 20 --skip 2 --custom '{}' --inv_y".format(hemi, fname, fname, fname, titlestr)
+    cmd = "python software/ql_figure.py -r ease-{}-wide -bg t0 -bgf {} -bg2 t1 -bgf2 {} -o figs --colbar --title --custom '{}' --inv_y".format(hemi, fname, fname, titlestr)
     check_call(cmd, shell=True)
 
 # 2. assemble the panels into a publication-ready file
@@ -101,7 +101,7 @@ check_call(cmd, shell=True)
 sh_files = ['figs/ice_drift_{a:}_ease2-750_cdr-v1p0-amsr2-gw1_24h-{r:%Y%m%d}1200_{t:}_simple_ease-{a:}-wide.png'.format(t=tstr, a='sh', r=rdate['sh']) for tstr in ('t0','t1','tdiff')]
 cmd = 'convert {} +append {}/fig_time_sh.png'.format(" ".join(sh_files), tmp_dir)
 check_call(cmd, shell=True)
-cmd = 'convert {}/fig_time_nh.png {}/fig_time_sh.png -append {}/fig{:02d}.png'.format(tmp_dir, tmp_dir, final_dir, fig_cnt)
+cmd = 'convert {}/fig_time_nh.png {}/fig_time_sh.png -smush -150 {}/fig{:02d}.png'.format(tmp_dir, tmp_dir, final_dir, fig_cnt)
 check_call(cmd, shell=True)
 
 # Example maps of dX and dY
@@ -132,7 +132,7 @@ check_call(cmd, shell=True)
 sh_files = ['figs/ice_drift_{a:}_ease2-750_cdr-v1p0_24h-{r:%Y%m%d}1200_{d:}_simple_{q:}.png'.format(d=dstr, a='sh', r=rdate['sh'], q=reg['sh']) for dstr in ('dX','dY',)]
 cmd = 'convert {} +append {}/fig_dxdy_sh.png'.format(" ".join(sh_files), tmp_dir)
 check_call(cmd, shell=True)
-cmd = 'convert {}/fig_dxdy_nh.png {}/fig_dxdy_sh.png -append {}/fig{:02d}.png'.format(tmp_dir, tmp_dir, final_dir, fig_cnt)
+cmd = 'convert {}/fig_dxdy_nh.png {}/fig_dxdy_sh.png -smush -150 {}/fig{:02d}.png'.format(tmp_dir, tmp_dir, final_dir, fig_cnt)
 check_call(cmd, shell=True)
 
 # Validation results (hexdXdY) for ssmi-f11 and amsr2-gw1 (winter)
