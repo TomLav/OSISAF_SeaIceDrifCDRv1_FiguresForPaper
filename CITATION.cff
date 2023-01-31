@@ -1,0 +1,31 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  Figures and Tables for the EUMETSAT OSI SAF Sea Ice Drift
+  Climate Data Records
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Emily
+    family-names: Down
+    email: emilyjd@met.no
+    affiliation: Norwegian Meteorological Institute
+    orcid: 'https://orcid.org/0000-0002-3460-2697'
+  - given-names: Thomas
+    family-names: Lavergne
+    email: thomas.lavergne@met.no
+    affiliation: Norwegian Meteorological Institute
+    orcid: 'https://orcid.org/0000-0002-9498-4551'
+repository-code: >-
+  https://github.com/TomLav/OSISAF_SeaIceDrifCDRv1_FiguresForPaper
+abstract: >-
+  This software prepares some of the figures and tables that
+  appear in the ESSD manuscript introducing the EUMETSAT OSI
+  SAF Sea Ice Drift Climate Data Record v1. The dataset has
+  DOI: https://doi.org/10.15770/EUM_SAF_OSI_0012
+version: '1.0'
+date-released: '2023-02-03'
