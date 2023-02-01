@@ -56,7 +56,6 @@ def add_regionalbox(ax, lat_n, lat_s, lon_w, lon_e, col='r', lw=1):
 def parse_args():
 
     drifttypechoice = ['simple', 'average', 'anomaly']
-    valid_flgfmt = ['final', 'proc']
 
     p = argparse.ArgumentParser("ql_figure",
                                 formatter_class=RawDescriptionHelpFormatter)
@@ -126,19 +125,15 @@ def parse_args():
     p.add_argument('--concband', action='store_true', default=True,
                    help="Plot ice concentration as open water/open ice/close "
                    "ice")
-    p.add_argument('--inv_y', action='store_true', default=False,
-                   help="Plot -1 times the y-variable (depending on format of "
-                   "files)")
-    p.add_argument('-ff', '--flgfmt', required=False, default='final',
-                   help="Format of status flags for plotting, default is "
-                   "'final', choices are {}".format(valid_flgfmt))
+    p.add_argument('-pf', '--procfmt', required=False, action='store_true',
+                   help="Use proc format files rather than final format")
 
     args = p.parse_args()
 
     return args
 
 
-def nc_read(ncfile, var, skip=None):
+def nc_read(ncfile, var, skip=None, procfmt=False):
 
     ncdata = {}
 
@@ -187,6 +182,10 @@ def nc_read(ncfile, var, skip=None):
                 else:
                     vardata = vardata[:, :]
 
+            # Proc format files have y-drift in opposite direction
+            if procfmt and item in ['dY', 'driftY']:
+                vardata = vardata * -1.
+
             # This is for reducing flags to the lowest integers
             if var in ['statusflag', 'status_flag', 'flag']:
                 vardata = np.asarray(vardata, float) + 100
@@ -207,7 +206,6 @@ def nc_read(ncfile, var, skip=None):
                 ncdata[item] = ma.array(vardata)
 
             if var in ['statusflag', 'status_flag', 'flag']:
-                #ncdata[item].mask = nanmask
                 ncdata[item].mask = None
             else:
                 ncdata[item].mask = ncdata[item].data == ncdata[item].fill_value
@@ -247,10 +245,6 @@ def nc_read(ncfile, var, skip=None):
         ncdata['time_bnds0'] = dataset.variables['time_bnds'][0][0]
         ncdata['time_bnds1'] = dataset.variables['time_bnds'][0][1]
 
-    if ncdata['yc'][-1] < ncdata['yc'][0]:
-        print("FLIPPING!!!")
-        ncdata['yc'] = np.flip(ncdata['yc'])
-
     # Grid spacing
     sorted_xc = np.sort(ncdata['xc'])
     sorted_yc = np.sort(ncdata['yc'])
@@ -267,9 +261,9 @@ def nc_read(ncfile, var, skip=None):
     else:
         sf = 1.
     ncdata['area_extent'] = (float(ncdata['xc'][0] * sf),
-                             float(ncdata['yc'][-1] * sf),
+                             float(ncdata['yc'][0] * sf),
                              float(ncdata['xc'][-1] * sf),
-                             float(ncdata['yc'][0] * sf))
+                             float(ncdata['yc'][-1] * sf))
     ncdata['mpl_extent'] = (ncdata['area_extent'][0],
                             ncdata['area_extent'][2],
                             ncdata['area_extent'][3],
@@ -353,9 +347,14 @@ def rotate_bg_components(xdata, ydata, londata, latdata, datacrs, plotcrs):
     return xplot, yplot
 
 
-def flag_arrow_col(flag, flgfmt='final'):
+def flag_arrow_col(flag, procfmt=False):
 
-    # Use colours from https://sashamaps.net/docs/maps/roman-roads-index/
+    if procfmt:
+        flgfmt = 'proc'
+    else:
+        flgfmt = 'final'
+
+    # Use colours from https://sashamaps.net/docs/resources/20-colors/
     fblack = '#000000'
     fmaroon = '#800000'
     forange = '#f58231'
@@ -370,23 +369,26 @@ def flag_arrow_col(flag, flgfmt='final'):
     fcyan = '#42d4f4'
     fmagenta = '#f032e6'
 
+    fred = '#e6194B'
+    fpurple = '#911eb4'
+
     flag_cols = {}
-    flag_cols['final'] = {30: fblack,  # nominal quality
-                          20: fbrown, # single-sensor, with smaller pattern
-                                      # block
-                          21: forange, # single-sensor, with neighbours as
-                                       # constraint
-                          22: fmaroon,   # interpolated
-                          23: fcyan, # Gap filling in wind drift
-                          24: fteal, # Vector replaced by wind drift
-                          25: fnavy, # Blended satellite and wind drift
-}
-    flag_cols['proc'] = {0: 'black',   # nominal quality
-                         16: 'purple',  # interpolated
-                         13: 'red',     # single-sensor, with neighbours as
+    flag_cols['final'] = {30: fblack,   # Nominal quality
+                          20: fbrown,   # Single-sensor, with smaller pattern
+                                        # block
+                          21: forange,  # Single-sensor, with neighbours as
                                         # constraint
-                         17: 'green',   # single-sensor, with smaller
-                                        #pattern block
+                          22: fmaroon,  # Interpolated
+                          23: fcyan,    # Gap filling in wind drift
+                          24: fteal,    # Vector replaced by wind drift
+                          25: fnavy,    # Blended satellite and wind drift
+}
+    flag_cols['proc'] = {0: fblack,     # Nominal quality
+                         16: fpurple,   # Interpolated
+                         13: fred,      # Single-sensor, with neighbours as
+                                        # constraint
+                         17: fgreen,    # Single-sensor, with smaller
+                                        # pattern block
 }
 
     default = 'black'
@@ -711,7 +713,7 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
               mylab=None, colbar=False, nocoast=False, regbox=False,
               flatbox=False,
               transectline=False, latlongrid=False, concband=True,
-              inv_y=False, flgfmt='final'):
+              procfmt=False):
 
     # Finding the region parameters
     rp = region_params(region)
@@ -746,19 +748,16 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
                 dyvar = 'avdY'
                 varlist = [dxvar, dyvar]
 
-        driftnc = nc_read(driftfile, varlist, skip=skip)
-
-        if inv_y:
-            driftnc[dyvar][:] = driftnc[dyvar][:] * -1.
+        driftnc = nc_read(driftfile, varlist, skip=skip, procfmt=procfmt)
 
     # Reading in background files
     if bgvar == 'displacement':
-        bgnc = nc_read(bgfile, ['dX', 'dY'])
+        bgnc = nc_read(bgfile, ['dX', 'dY'], procfmt=procfmt)
     else:
         if (bgfile is not None) and (bgvar is not None):
-            bgnc = nc_read(bgfile, bgvar)
+            bgnc = nc_read(bgfile, bgvar, procfmt=procfmt)
     if (bgfile2 is not None) and (bgvar2 is not None):
-        bgnc2 = nc_read(bgfile2, bgvar2)
+        bgnc2 = nc_read(bgfile2, bgvar2, procfmt=procfmt)
 
     if bgvar == 'displacement':
         bgnc['displacement'] = np.sqrt((bgnc['dX'] * bgnc['dX'])
@@ -855,12 +854,12 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
     # If the background quantity is something that needs to rotate to the
     # plot coordinate system, rotate this
     if bgyrot is not None:
-        bgncy = nc_read(bgfile, bgyrot)
+        bgncy = nc_read(bgfile, bgyrot, procfmt=procfmt)
         bgnc[bgvar], _ = rotate_bg_components(bgnc[bgvar], bgncy[bgyrot],
                                               bgnc['lon'], bgnc['lat'],
                                               bgnc['data_ccrs'], plot_crs)
     elif bgxrot is not None:
-        bgncx = nc_read(bgfile, bgxrot)
+        bgncx = nc_read(bgfile, bgxrot, procfmt=procfmt)
         _, bgnc[bgvar] = rotate_bg_components(bgncx[bgxrot], bgnc[bgvar],
                                               bgnc['lon'], bgnc['lat'],
                                               bgnc['data_ccrs'], plot_crs)
@@ -963,9 +962,7 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
                         driftnc['lat'][~driftnc[dxvar].mask][i],
                         src_crs=pc)
                     xarr = xorig + adx
-                    # The dy component needs to be + for wind and - for ice
-                    # drift
-                    yarr = yorig - ady
+                    yarr = yorig + ady
                     x1, y1 = plot_crs.transform_point(xarr, yarr,
                         src_crs=driftnc['data_ccrs'])
                     pdx = scale * (x1 - x0)
@@ -975,7 +972,7 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
                     # done with status flags
                     if driftflags:
                         myflag = driftnc[sflag][~driftnc[dxvar].mask][i]
-                        ar_col = flag_arrow_col(myflag, flgfmt=flgfmt)
+                        ar_col = flag_arrow_col(myflag, procfmt=procfmt)
 
                     # If the arrow is too small, mark a symbol instead
                     if len_arrow * scale < 2000:
@@ -1122,7 +1119,6 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
         foutput = os.path.basename(fbasename).replace('.nc',
                                                     '_' + name + '.png')
         output = os.path.join(output,foutput)
-        print("Output file at {}".format(output))
 
     dpi = 180
     if high_dpi:
@@ -1170,8 +1166,7 @@ def main():
     transectline = args.transectline
     latlongrid = args.latlongrid
     concband = args.concband
-    inv_y = args.inv_y
-    flgfmt = args.flgfmt
+    procfmt = args.procfmt
 
     ql_figure(output, driftfile=driftfile, bgvar=bgvar, bgfile=bgfile,
               bgyrot=bgyrot, bgxrot=bgxrot, bgvar2=bgvar2, bgfile2=bgfile2,
@@ -1180,7 +1175,7 @@ def main():
               high_dpi=high_dpi, title=title, custom=custom, mylab=mylab,
               colbar=colbar, nocoast=nocoast, regbox=regbox, flatbox=flatbox,
               transectline=transectline, latlongrid=latlongrid,
-              concband=concband, inv_y=inv_y, flgfmt=flgfmt)
+              concband=concband, procfmt=procfmt)
 
 
 if __name__ == '__main__':

@@ -87,11 +87,11 @@ for hemi in ['nh', 'sh']:
         fname="https://thredds.met.no/thredds/dodsC/osisaf/met.no/reprocessed/ice/drift_455m_files/merged/{:%Y}/{:%m}/ice_drift_{}_ease2-750_cdr-v1p0_24h-{:%Y%m%d}1200.nc".format(rdate[hemi], rdate[hemi], hemi, rdate[hemi])
     sdate = rdate[hemi] - timedelta(days=1)
     titlestr="{} / {:%Y-%m-%d} to {:%Y-%m-%d}".format(sens.upper(), sdate, rdate[hemi])
-    cmd = "python software/ql_figure.py -r ease-{}-wide -bg t0 -bgf {} -o figs --colbar --title --custom '{}' --inv_y".format(hemi, fname, titlestr)
+    cmd = "python software/ql_figure.py -r ease-{}-wide -bg t0 -bgf {} -o figs --colbar --title --custom '{}'".format(hemi, fname, titlestr)
     check_call(cmd, shell=True)
-    cmd = "python software/ql_figure.py -r ease-{}-wide -bg t1 -bgf {} -o figs --colbar --title --custom '{}' --inv_y".format(hemi, fname, titlestr)
+    cmd = "python software/ql_figure.py -r ease-{}-wide -bg t1 -bgf {} -o figs --colbar --title --custom '{}'".format(hemi, fname, titlestr)
     check_call(cmd, shell=True)
-    cmd = "python software/ql_figure.py -r ease-{}-wide -bg t0 -bgf {} -bg2 t1 -bgf2 {} -o figs --colbar --title --custom '{}' --inv_y".format(hemi, fname, fname, titlestr)
+    cmd = "python software/ql_figure.py -r ease-{}-wide -bg t0 -bgf {} -bg2 t1 -bgf2 {} -o figs --colbar --title --custom '{}'".format(hemi, fname, fname, titlestr)
     check_call(cmd, shell=True)
 
 # 2. assemble the panels into a publication-ready file
@@ -120,9 +120,9 @@ for hemi in ['nh', 'sh']:
         fname="https://thredds.met.no/thredds/dodsC/osisaf/met.no/reprocessed/ice/drift_455m_files/merged/{:%Y}/{:%m}/ice_drift_{}_ease2-750_cdr-v1p0_24h-{:%Y%m%d}1200.nc".format(rdate[hemi], rdate[hemi], hemi, rdate[hemi])
     sdate = rdate[hemi] - timedelta(days=1)
     titlestr="{} / {:%Y-%m-%d} to {:%Y-%m-%d}".format(sens.upper(), sdate, rdate[hemi])
-    cmd = "python software/ql_figure.py -r {} -d {} -bg dX -bgf {} -o figs --colbar --title --scale 10 --skip 1 --custom '{}' --latlongrid --inv_y".format(reg[hemi], fname, fname, titlestr)
+    cmd = "python software/ql_figure.py -r {} -d {} -bg dX -bgf {} -o figs --colbar --title --scale 10 --skip 1 --custom '{}' --latlongrid".format(reg[hemi], fname, fname, titlestr)
     check_call(cmd, shell=True)
-    cmd = "python software/ql_figure.py -r {} -d {} -bg dY -bgf {} -o figs --colbar --title --scale 10 --skip 1 --custom '{}' --latlongrid --inv_y".format(reg[hemi], fname, fname, titlestr)
+    cmd = "python software/ql_figure.py -r {} -d {} -bg dY -bgf {} -o figs --colbar --title --scale 10 --skip 1 --custom '{}' --latlongrid".format(reg[hemi], fname, fname, titlestr)
     check_call(cmd, shell=True)
 
 # 2. assemble the panels into a publication-ready file

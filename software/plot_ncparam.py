@@ -347,7 +347,7 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
             vmax = 10
             data_cmap_lvl  = np.arange(vmax, vmin-0.01,-10)
             norm = None
-            datacmap = cmap_norm_to_lims(cmocean.cm.balance, -40, 40, 
+            datacmap = cmap_norm_to_lims(cmocean.cm.balance, -40, 40,
                                          vmin, vmax)
         else:
             vmin = -10
@@ -417,7 +417,6 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
                 adx = geocx[~geocxmask][i]
                 ady = geocy[~geocymask][i]
                 len_arrow = math.sqrt(adx**2 + ady**2)
-                #print("lenarr = ", len_arrow * scale)
 
                 # Calculate the endpoints and therefore dx, dy components of
                 # the geostrophic current arrows in the plot coordinate system
@@ -425,8 +424,6 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
                                                          lats[~geocxmask][i],
                                                          src_crs=pc)
                 xarr = xorig + adx
-                # The dy component needs to be + for wind and - for ice
-                # drift
                 yarr = yorig + ady
                 # This was plot_crs
                 x1, y1 = data_ccrs.transform_point(xarr, yarr,
@@ -434,7 +431,6 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
                 pdx = scale * (x1 - x0)
                 pdy = scale * (y1 - y0)
 
-                #print("pdx, pdy = ", pdx, pdy)
                 # If the arrow is too small, mark a symbol instead
                 if len_arrow * scale < 2000:
                     plt.plot(x0, y0, 's', color='black', markersize=1)
