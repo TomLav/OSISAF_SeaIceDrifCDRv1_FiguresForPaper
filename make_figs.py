@@ -38,7 +38,7 @@ cmd = 'convert {} +append {}/fig_buoycover_sh.png'.format(" ".join(sh_files), tm
 check_call(cmd, shell=True)
 cmd = 'convert {}/fig_buoycover_nh.png {}/fig_buoycover_sh.png -append {}/fig{:02d}.png'.format(tmp_dir, tmp_dir, final_dir, fig_cnt)
 check_call(cmd, shell=True)
-
+print("Done with figure {}".format(fig_cnt))
 
 # Example maps free-drift parameters (1 for NH, 1 for SH)
 # =======================================================
@@ -59,18 +59,20 @@ cmd = "python software/plot_ncparam.py -i https://thredds.met.no/thredds/dodsC/m
 check_call(cmd, shell=True)
 
 # 2. assemble the panels into a publication-ready file
-cmd = "montage -label '(a) |A|' figs/inv_params_osi455_nh_200301-202012_1day_jul_absA.png -label '(b) Turning angle' figs/inv_params_osi455_nh_200301-202012_1day_jul_ThetaA.png -label '(c) Geostrophic current' figs/inv_params_osi455_nh_200301-202012_1day_jul_C_real_C_imag.png -tile 3x1 -geometry '622x586>+5+5' -pointsize 23 figs/freedriftparameter_nh_3panels.png"
+cmd = "montage -label '(a) |A|' figs/inv_params_osi455_nh_200301-202012_1day_jul_absA.png -label '(b) Turning angle' figs/inv_params_osi455_nh_200301-202012_1day_jul_ThetaA.png -label '(c) Geostrophic current' figs/inv_params_osi455_nh_200301-202012_1day_jul_C_real_C_imag.png -tile 3x1 -geometry '622x586>+5+5' -pointsize 35 figs/freedriftparameter_nh_3panels.png"
 check_call(cmd, shell=True)
 
-cmd = "montage -label '(a) |A|' figs/inv_params_osi455_sh_200208-202007_1day_dec_absA.png -label '(b) Turning angle' figs/inv_params_osi455_sh_200208-202007_1day_dec_ThetaA.png -label '(c) Geostrophic current' figs/inv_params_osi455_sh_200208-202007_1day_dec_C_real_C_imag.png -tile 3x1 -geometry '622x559>+5+5' -pointsize 23 figs/freedriftparameter_sh_3panels.png"
+cmd = "montage -label '(a) |A|' figs/inv_params_osi455_sh_200208-202007_1day_dec_absA.png -label '(b) Turning angle' figs/inv_params_osi455_sh_200208-202007_1day_dec_ThetaA.png -label '(c) Geostrophic current' figs/inv_params_osi455_sh_200208-202007_1day_dec_C_real_C_imag.png -tile 3x1 -geometry '622x559>+5+5' -pointsize 35 figs/freedriftparameter_sh_3panels.png"
 check_call(cmd, shell=True)
 
 cmd = 'cp figs/freedriftparameter_nh_3panels.png {}/fig{:02d}.png'.format(final_dir, fig_cnt)
 check_call(cmd, shell=True)
+print("Done with figure {}".format(fig_cnt))
 
 fig_cnt += 1
 cmd = 'cp figs/freedriftparameter_sh_3panels.png {}/fig{:02d}.png'.format(final_dir, fig_cnt)
 check_call(cmd, shell=True)
+print("Done with figure {}".format(fig_cnt))
 
 
 # Example maps of t0, t1, and tdiff
@@ -101,8 +103,9 @@ check_call(cmd, shell=True)
 sh_files = ['figs/ice_drift_{a:}_ease2-750_cdr-v1p0-amsr2-gw1_24h-{r:%Y%m%d}1200_{t:}_simple_ease-{a:}-wide.png'.format(t=tstr, a='sh', r=rdate['sh']) for tstr in ('t0','t1','tdiff')]
 cmd = 'convert {} +append {}/fig_time_sh.png'.format(" ".join(sh_files), tmp_dir)
 check_call(cmd, shell=True)
-cmd = 'convert {}/fig_time_nh.png {}/fig_time_sh.png -smush -150 {}/fig{:02d}.png'.format(tmp_dir, tmp_dir, final_dir, fig_cnt)
+cmd = 'convert {}/fig_time_nh.png {}/fig_time_sh.png -smush -170 {}/fig{:02d}.png'.format(tmp_dir, tmp_dir, final_dir, fig_cnt)
 check_call(cmd, shell=True)
+print("Done with figure {}".format(fig_cnt))
 
 # Example maps of dX and dY
 # =================================
@@ -132,8 +135,9 @@ check_call(cmd, shell=True)
 sh_files = ['figs/ice_drift_{a:}_ease2-750_cdr-v1p0_24h-{r:%Y%m%d}1200_{d:}_simple_{q:}.png'.format(d=dstr, a='sh', r=rdate['sh'], q=reg['sh']) for dstr in ('dX','dY',)]
 cmd = 'convert {} +append {}/fig_dxdy_sh.png'.format(" ".join(sh_files), tmp_dir)
 check_call(cmd, shell=True)
-cmd = 'convert {}/fig_dxdy_nh.png {}/fig_dxdy_sh.png -smush -150 {}/fig{:02d}.png'.format(tmp_dir, tmp_dir, final_dir, fig_cnt)
+cmd = 'convert {}/fig_dxdy_nh.png {}/fig_dxdy_sh.png -smush -170 {}/fig{:02d}.png'.format(tmp_dir, tmp_dir, final_dir, fig_cnt)
 check_call(cmd, shell=True)
+print("Done with figure {}".format(fig_cnt))
 
 # Validation results (hexdXdY) for ssmi-f11 and amsr2-gw1 (winter)
 # =================================
@@ -149,6 +153,7 @@ cmd = 'convert {} +append {}/fig_winterhexdXdY_sh.png'.format(' '.join(sh_files)
 check_call(cmd, shell=True)
 cmd = 'convert {}/fig_winterhexdXdY_nh.png {}/fig_winterhexdXdY_sh.png -append {}/fig{:02d}.png'.format(tmp_dir, tmp_dir, final_dir, fig_cnt)
 check_call(cmd, shell=True)
+print("Done with figure {}".format(fig_cnt))
 
 # Validation results (hexdXdY) for wind-driven motion (summer)
 # =================================
@@ -158,6 +163,7 @@ fig_cnt += 1
 # 2. assemble the panels into a publication-ready file
 cmd = 'convert figs/wind_pamb_ssmiamsr_NH_summernh_hexdXdY.png figs/wind_pamb_ssmiamsr_SH_summersh_hexdXdY.png -append {}/fig{:02d}.png'.format(final_dir, fig_cnt)
 check_call(cmd, shell=True)
+print("Done with figure {}".format(fig_cnt))
 
 # Validation results (hexdXdY) for multi-source motion (year-round)
 # =================================
@@ -167,6 +173,7 @@ fig_cnt += 1
 # 2. assemble the panels into a publication-ready file
 cmd = 'convert figs/mrg_wind_pamb_ssmiamsr_NH_hexdXdY.png figs/mrg_wind_pamb_ssmiamsr_SH_hexdXdY.png -append {}/fig{:02d}.png'.format(final_dir, fig_cnt)
 check_call(cmd, shell=True)
+print("Done with figure {}".format(fig_cnt))
 
 # Validation results (timeseries) for dx (Arctic)
 # =================================
@@ -176,3 +183,4 @@ fig_cnt += 1
 # 2. assemble the panels into a publication-ready file
 cmd = 'convert figs/timeseries_winter_nh_dx_cropped.png figs/timeseries_summer_nh_dx_cropped.png +append {}/fig{:02d}.png'.format(final_dir, fig_cnt)
 check_call(cmd, shell=True)
+print("Done with figure {}".format(fig_cnt))

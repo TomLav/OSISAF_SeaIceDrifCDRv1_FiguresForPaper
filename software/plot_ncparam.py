@@ -23,6 +23,8 @@ import cmocean
 
 from grid_info import region_params
 
+tickfont = 30
+
 month_dict = {1: 'jan',
               2: 'feb',
               3: 'mar',
@@ -36,6 +38,18 @@ month_dict = {1: 'jan',
               11: 'nov',
               12: 'dec'}
 
+SMALL_SIZE = 10
+MEDIUM_SIZE = 12
+BIGGER_SIZE = 15
+BIG_SIZE = 18
+HUGE_SIZE = 30
+plt.rc('font', size=BIG_SIZE)          # controls default text sizes
+#plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+#plt.rc('axes', labelsize=SMALL_SIZE)    # fontsize of the x and y labels
+#plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+#plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+#plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+#plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 def parse_args():
 
@@ -457,10 +471,15 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
                                   orientation='vertical', pad=0.05, shrink=0.8)
                 cb.ax.set_yticklabels(cmap_labs)
                 cb.set_label(colbar_label)
+                cb.ax.tick_params(labelsize=tickfont)
             else:
+                #plt.yticks(fontsize=tickfont)
                 plt.colorbar(datacbar, ticks=data_cmap_lvl,
                              orientation='vertical', pad=0.05, shrink=0.8
                          ).set_label(colbar_label)
+                #cb.ax.tick_params(labelsize=tickfont)
+                #ticklabs = cb.ax.get_yticklabels()
+                #cb.ax.set_yticklabels(ticklabs, fontsize=tickfont)
 
     if param != 'flags':
         ax.add_feature(cfeature.NaturalEarthFeature('physical', 'land',

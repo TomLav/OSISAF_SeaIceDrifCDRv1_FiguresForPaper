@@ -168,8 +168,8 @@ def region_params(region):
         rp['scale'] = 5
         rp['skip']  = 3
         rp['labelpos'] = 0.75
-        rp['logo_left'] = 0.27
-        rp['logo_bottom'] = 0.65
+        rp['logo_left'] = 0.27 # 0.21
+        rp['logo_bottom'] = 0.65 # 0.55
     elif region == 'ease-nh-very-wide':
         rp['lllat'] = 10.
         rp['lllon'] = -45.

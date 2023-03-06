@@ -26,6 +26,14 @@ col_sea = '#04629a'
 col_iceconc50 = '#9b9b9b'
 col_iceconc100 = 'white'
 
+titlefont = 15
+labelfont = 15
+#copyfontsize = 6
+copyfont = 8
+deffont = 15
+plt.rc('font', size=deffont) # controls default text sizes
+
+
 def add_regionalbox(ax, lat_n, lat_s, lon_w, lon_e, col='r', lw=1):
 
     # Add regional boxes
@@ -881,7 +889,6 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
     else:
         fig = plt.figure(figsize=(8, 6))
     ax = plt.axes(projection=plot_crs)
-#    ax.set_extent(map_extent, crs=plot_crs)
     ax.set_extent([llx, urx, lly, ury], crs=plot_crs)
 
     if bgvar2 is not None:
@@ -907,18 +914,25 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
                        vmin=bgdict['min'], norm=bgdict['norm'],
                        interpolation='none')
 
+
     if colbar:
         if bgdict['colbar_type'] == 'discrete':
             cb = plt.colorbar(bg, ticks=bgdict['cmap_lvl'],
                               orientation='horizontal', pad=0.05, shrink=0.7
             )
             cb.ax.set_xticklabels(bgdict['cmap_labs'])
-            cb.set_label(bgdict['colbar_label'])
+            cb.set_label(bgdict['colbar_label'], fontsize=labelfont)
         else:
+            #fig = plt.gcf()
+            ## [left, bottom, width, height] # [left, bottom, width, height]
+            # cax = fig.add_axes([0.2, 0.02, 0.6, 0.04])
+            #plt.colorbar(bg, cax=cax, ticks=bgdict['cmap_lvl'],
+            #             orientation='horizontal', pad=0.05, shrink=0.4
+            #).set_label(bgdict['colbar_label'], fontsize=labelfont)
+            #cax.tick_params(axis='x', which='major', labelsize=labelfont)
             plt.colorbar(bg, ticks=bgdict['cmap_lvl'],
                          orientation='horizontal', pad=0.05, shrink=0.65
             ).set_label(bgdict['colbar_label'])
-
 
     if not nocoast:
         ax.add_feature(cfeature.NaturalEarthFeature('physical', 'land',
@@ -1057,7 +1071,7 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
                 rp['long_name'],
                 datetime.strftime(driftnc['sdate'], '%Y-%m-%d 12:00:00'),
             datetime.strftime(driftnc['edate'], '%Y-%m-%d 12:00:00'))
-        plt.title(custom, fontsize='small', style=ftype)
+        plt.title(custom, fontsize=titlefont, style=ftype)
 
     # Print area and copyright
     copyrightstr = '© '+ '(' + str(datetime.today().year).zfill(4) + ') ' + 'EUMETSAT'
@@ -1065,10 +1079,10 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
     if 'labelpos' in rp:
         txt1x = rp['labelpos']
     txt1y = -0.03
-    copyfontsize = 6
+    copyfontsize = copyfont
     if 'copyfontsize' in rp:
         copyfontsize = rp['copyfontsize']
-    ax.annotate(copyrightstr, xy=(txt1x,txt1y), xycoords='axes fraction',
+    ax.annotate(copyrightstr, xy=(txt1x-0.05,txt1y), xycoords='axes fraction',
                 fontsize=copyfontsize, style=ftype)
 
     # Logo
@@ -1092,7 +1106,6 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
     ax2 = fig.add_axes(logo_xy)
     ax2.imshow(img, zorder=1)
     ax2.axis('off')
-
 
     if colbar and bgvar2 is not None:
         ins_ax = inset_axes(ax, width='20%', height='5%', loc=1, borderpad=2)
