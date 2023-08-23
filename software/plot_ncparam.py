@@ -15,6 +15,7 @@ matplotlib.use('Agg')
 matplotlib.style.use('classic')
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+from matplotlib import cm
 import cartopy
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
@@ -292,6 +293,7 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
             print("-- max(data) = ", np.nanmax(data))
             print("-- lower threshold data (99%) = ", datasort[thresh - 1])
             print("-- upper threshold data (99%) = ", datasort[-thresh])
+            print("-- mean(data) = ", np.nanmean(data))
 
         if param == 'flags':
             # Make a plotting array with
@@ -347,7 +349,7 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
             data_cmap_lvl  = [-0.06, -0.03, 0.0, 0.03, 0.06]
             norm = colors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
         if label is None:
-            colbar_label = r'$U_{wg}\ [m.s^{-1}]$'
+            colbar_label = r'(c)  $U_{wg}\ [m.s^{-1}]$'
     if param in  ['RMS_Res_real', 'RMS_Res_imag']:
         datacmap = cmocean.cm.haline
         vmin = 0.0
@@ -355,31 +357,31 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
         data_cmap_lvl  = [0, 0.02, 0.04, 0.06, 0.08, 0.1]
         norm = None
     if param in  ['absA', 'absA_gapfill']:
+        # express the tranfer coefficient as %
+        data *= 100
         datacmap = cmocean.cm.haline
-        vmin = 0.00
-        vmax = 0.03
-        data_cmap_lvl  = [0.0, 0.01, 0.02, 0.03]
+        vmin = 0
+        vmax = 3.
+        data_cmap_lvl  = [0.0, 1, 2, 3]
         norm = None
         if label is None:
-            colbar_label = r"$|A|$"
+            colbar_label = r"(a)  $|A|\ [\%]$"
     if param in  ['ThetaA', 'ThetaA_gapfill']:
         if hemi == 'nh':
             vmin = -40.
-            vmax = 10
-            data_cmap_lvl  = np.arange(vmax, vmin-0.01,-10)
+            vmax = 0.
+            data_cmap_lvl  = np.arange(vmin, vmax+0.01,10)
             norm = None
-            datacmap = cmap_norm_to_lims(cmocean.cm.balance, -40, 40,
-                                         vmin, vmax)
+            datacmap = cm.Blues_r
         else:
-            vmin = -10
-            vmax = 40.
+            vmin = 0.
+            vmax = +40.
             data_cmap_lvl  = np.arange(vmin, vmax+0.01,10)
             norm = None
             inv_yax = True
-            datacmap = cmap_norm_to_lims(cmocean.cm.balance, -40, 40,
-                                         vmin, vmax)
+            datacmap = cm.Reds
         if label is None:
-            colbar_label = r"$\theta\ [ ^{\circ}]$"
+            colbar_label = r"(b)  $\theta\ [ ^{\circ}]$"
     if param in  ['lon']:
         datacmap = cmocean.cm.balance
         vmin = -180
@@ -422,6 +424,9 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
         datacbar = ax.imshow(data, cmap=datacmap, extent=mpl_data_extent,
                              transform=data_ccrs, vmin=vmin, vmax=vmax,
                              norm=norm, interpolation='none')
+        #cl = ax.contour(data, colors='k', levels=data_cmap_lvl, extent=mpl_data_extent,
+        #        transform=data_ccrs, origin='image')
+        #ax.clabel(cl, inline=True, fontsize=10)
 
     # Plotting the geostrophic currents
     if geocurr:
@@ -430,6 +435,7 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
         scale = exscale * gscale
         for i in range(geocx.size):
             try:
+                if i % 2: continue
                 # This was plot_crs
                 x0, y0 = data_ccrs.transform_point(lons[~geocxmask][i],
                                                    lats[~geocxmask][i],
@@ -438,6 +444,8 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
                 adx = geocx[~geocxmask][i]
                 ady = geocy[~geocymask][i]
                 len_arrow = math.sqrt(adx**2 + ady**2)
+                if len_arrow >= 0.05:
+                    continue
 
                 # Calculate the endpoints and therefore dx, dy components of
                 # the geostrophic current arrows in the plot coordinate system
