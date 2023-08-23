@@ -538,12 +538,13 @@ def bg_plot_setup(bgvar=None, bgnc=None):
     elif bgvar == 'displacement':
         bg['lbl']  = 'Displacement over 24 hours [km]'
         #bg['fld']  = pow((pow(u,2) + pow(v,2)), 0.5) / 1000
-        bg['max'] = 30
+        bg['max'] = 40
         bg['min']  = 0
-        bg['cmap'] = cmocean.cm.thermal
+        bg['cmap'] = cmocean.cm.haline
         bg['cmap_lvl'] = np.arange(bg['min'], bg['max'], 5)
         bg['cmap_fmt'] = '%2.0f'
         bg['colbar_label'] = bg['lbl']
+        bg['alpha'] = 0.3
 
     # Final format status flag array
     elif bgvar in ['statusflag', 'status_flag', 'flag']:
@@ -912,7 +913,7 @@ def ql_figure(output, driftfile=None, bgvar=None, bgfile=None, bgyrot=None,
                        transform=bgnc['data_ccrs'],
                        cmap=bgdict['cmap'], vmax=bgdict['max'],
                        vmin=bgdict['min'], norm=bgdict['norm'],
-                       interpolation='none')
+                       interpolation='none', alpha=bgdict['alpha'])
 
 
     if colbar:
