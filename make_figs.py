@@ -43,26 +43,30 @@ print("Done with figure {}".format(fig_cnt))
 # Example maps free-drift parameters (1 for NH, 1 for SH)
 # =======================================================
 fig_cnt += 1
+in_file_nh = '/lustre/storeB/users/emilyjd/ice_drift_output/ice_drift_cdr/paramfiles/concatenated/freedrift_params_osi455_nh.nc'
+in_file_sh = '/lustre/storeB/users/emilyjd/ice_drift_output/ice_drift_cdr/paramfiles/concatenated/freedrift_params_osi455_sh.nc'
 # 1. run the notebook/script
-cmd = "python software/plot_ncparam.py -i https://thredds.met.no/thredds/dodsC/metusers/thomasl/SIDrift_CDR_v1pre/auxiliary_files/inv_params_osi455_nh_200301-202012_1day.nc -m 7 -o figs -p absA "
+cmd = "python software/plot_ncparam.py -i {} -m 7 -o figs -p absA".format(in_file_nh)
 check_call(cmd, shell=True)
-cmd = "python software/plot_ncparam.py -i https://thredds.met.no/thredds/dodsC/metusers/thomasl/SIDrift_CDR_v1pre/auxiliary_files/inv_params_osi455_nh_200301-202012_1day.nc -m 7 -o figs -p ThetaA "
+cmd = "python software/plot_ncparam.py -i {} -m 7 -o figs -p ThetaA".format(in_file_nh)
 check_call(cmd, shell=True)
-cmd = "python software/plot_ncparam.py -i https://thredds.met.no/thredds/dodsC/metusers/thomasl/SIDrift_CDR_v1pre/auxiliary_files/inv_params_osi455_nh_200301-202012_1day.nc -m 7 -o figs -p C_real -p2 C_imag -s -g --gskip 2 --gscale 15 "
+cmd = "python software/plot_ncparam.py -i {} -m 7 -o figs -p C_real -p2 C_imag -s -g --gskip 2 --gscale 15".format(in_file_nh)
 check_call(cmd, shell=True)
 
-cmd = "python software/plot_ncparam.py -i https://thredds.met.no/thredds/dodsC/metusers/thomasl/SIDrift_CDR_v1pre/auxiliary_files/inv_params_osi455_sh_200208-202007_1day.nc -m 12 -o figs -p absA "
+cmd = "python software/plot_ncparam.py -i {} -m 12 -o figs -p absA ".format(in_file_sh)
 check_call(cmd, shell=True)
-cmd = "python software/plot_ncparam.py -i https://thredds.met.no/thredds/dodsC/metusers/thomasl/SIDrift_CDR_v1pre/auxiliary_files/inv_params_osi455_sh_200208-202007_1day.nc -m 12 -o figs -p ThetaA "
+cmd = "python software/plot_ncparam.py -i {} -m 12 -o figs -p ThetaA ".format(in_file_sh)
 check_call(cmd, shell=True)
-cmd = "python software/plot_ncparam.py -i https://thredds.met.no/thredds/dodsC/metusers/thomasl/SIDrift_CDR_v1pre/auxiliary_files/inv_params_osi455_sh_200208-202007_1day.nc -m 12 -o figs -p C_real -p2 C_imag -s -g --gskip 2 --gscale 15 "
+cmd = "python software/plot_ncparam.py -i {} -m 12 -o figs -p C_real -p2 C_imag -s -g --gskip 2 --gscale 15 ".format(in_file_sh)
 check_call(cmd, shell=True)
 
 # 2. assemble the panels into a publication-ready file
-cmd = "montage -label '(a) |A|' figs/inv_params_osi455_nh_200301-202012_1day_jul_absA.png -label '(b) Turning angle' figs/inv_params_osi455_nh_200301-202012_1day_jul_ThetaA.png -label '(c) Geostrophic current' figs/inv_params_osi455_nh_200301-202012_1day_jul_C_real_C_imag.png -tile 3x1 -geometry '622x586>+5+5' -pointsize 35 figs/freedriftparameter_nh_3panels.png"
+#cmd = "montage -label '(a) |A|' figs/inv_params_osi455_nh_200301-202012_1day_jul_absA.png -label '(b) Turning angle' figs/inv_params_osi455_nh_200301-202012_1day_jul_ThetaA.png -label '(c) Geostrophic current' figs/inv_params_osi455_nh_200301-202012_1day_jul_C_real_C_imag.png -tile 3x1 -geometry '622x586>+5+5' -pointsize 35 figs/freedriftparameter_nh_3panels.png"
+cmd = "montage figs/freedrift_params_osi455_nh_jul_absA.png figs/freedrift_params_osi455_nh_jul_ThetaA.png figs/freedrift_params_osi455_nh_jul_C_real_C_imag.png -tile 3x1 -geometry '730x763' -pointsize 35 figs/freedriftparameter_nh_3panels.png"
 check_call(cmd, shell=True)
 
-cmd = "montage -label '(a) |A|' figs/inv_params_osi455_sh_200208-202007_1day_dec_absA.png -label '(b) Turning angle' figs/inv_params_osi455_sh_200208-202007_1day_dec_ThetaA.png -label '(c) Geostrophic current' figs/inv_params_osi455_sh_200208-202007_1day_dec_C_real_C_imag.png -tile 3x1 -geometry '622x559>+5+5' -pointsize 35 figs/freedriftparameter_sh_3panels.png"
+#cmd = "montage -label '(a) |A|' figs/inv_params_osi455_sh_200208-202007_1day_dec_absA.png -label '(b) Turning angle' figs/inv_params_osi455_sh_200208-202007_1day_dec_ThetaA.png -label '(c) Geostrophic current' figs/inv_params_osi455_sh_200208-202007_1day_dec_C_real_C_imag.png -tile 3x1 -geometry '622x559>+5+5' -pointsize 35 figs/freedriftparameter_sh_3panels.png"
+cmd = "montage figs/freedrift_params_osi455_sh_dec_absA.png figs/freedrift_params_osi455_sh_dec_ThetaA.png figs/freedrift_params_osi455_sh_dec_C_real_C_imag.png -tile 3x1 -geometry '730x763' -pointsize 35 figs/freedriftparameter_sh_3panels.png"
 check_call(cmd, shell=True)
 
 cmd = 'cp figs/freedriftparameter_nh_3panels.png {}/fig{:02d}.png'.format(final_dir, fig_cnt)

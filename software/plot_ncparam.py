@@ -81,6 +81,8 @@ def parse_args():
                    help="Output plot directory")
     p.add_argument('-c', '--cline', action='store_true', default=False,
                    help="Plot a contour line around the un-gapfilled data")
+    p.add_argument('-l', '--label', default=None,
+                   help="Label for the colorbar (default is to use -p <param>)")
     args = p.parse_args()
 
     return args
@@ -124,7 +126,7 @@ def colbar_flags_discrete():
 
 def plot_ncparam(infile, month, param, param2=None, meansq=False,
                  geocurr=False, gskip=None, gscale=1, nobg=False, outdir='.',
-                 cline=False):
+                 cline=False, label=None):
 
     if param.endswith('_gapfill'):
         gapfill = True
@@ -323,6 +325,7 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
     # Plotting setup
     colbar_type = 'cont'
     inv_yax = False
+    colbar_label = label
     if param in  ['A_real', 'A_imag', 'A_real_gapfill', 'A_imag_gapfill']:
         datacmap = cmocean.cm.haline
         vmin = -0.02
@@ -343,6 +346,8 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
             vmax = 0.06
             data_cmap_lvl  = [-0.06, -0.03, 0.0, 0.03, 0.06]
             norm = colors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
+        if label is None:
+            colbar_label = r'$U_{wg}\ [m.s^{-1}]$'
     if param in  ['RMS_Res_real', 'RMS_Res_imag']:
         datacmap = cmocean.cm.haline
         vmin = 0.0
@@ -353,8 +358,10 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
         datacmap = cmocean.cm.haline
         vmin = 0.00
         vmax = 0.03
-        data_cmap_lvl  = [0.0, 0.005, 0.01, 0.015, 0.02, 0.025, 0.03]
+        data_cmap_lvl  = [0.0, 0.01, 0.02, 0.03]
         norm = None
+        if label is None:
+            colbar_label = r"$|A|$"
     if param in  ['ThetaA', 'ThetaA_gapfill']:
         if hemi == 'nh':
             vmin = -40.
@@ -371,6 +378,8 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
             inv_yax = True
             datacmap = cmap_norm_to_lims(cmocean.cm.balance, -40, 40,
                                          vmin, vmax)
+        if label is None:
+            colbar_label = r"$\theta\ [ ^{\circ}]$"
     if param in  ['lon']:
         datacmap = cmocean.cm.balance
         vmin = -180
@@ -385,8 +394,6 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
         cmap_labs = ['Param', 'Gapfilled', 'Land', 'No ice', 'No drift']
         norm = None
         colbar_type = 'discrete'
-
-    colbar_label = ""
 
     # Fetching the region parameters from the file and converting
     # from lat/lon
@@ -404,7 +411,7 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
     # Setting up the plot
     colbar = True
     if colbar:
-        plt.figure(figsize=(8, 7))
+        plt.figure(figsize=(8.5, 6))
     else:
         plt.figure(figsize=(8, 6))
     ax = plt.axes(projection=data_ccrs)
@@ -468,14 +475,14 @@ def plot_ncparam(infile, month, param, param2=None, meansq=False,
         if colbar:
             if colbar_type == 'discrete':
                 cb = plt.colorbar(datacbar, ticks=data_cmap_lvl,
-                                  orientation='vertical', pad=0.05, shrink=0.8)
+                                  orientation='horizontal', pad=0.05, shrink=0.6)
                 cb.ax.set_yticklabels(cmap_labs)
                 cb.set_label(colbar_label)
                 cb.ax.tick_params(labelsize=tickfont)
             else:
                 #plt.yticks(fontsize=tickfont)
                 plt.colorbar(datacbar, ticks=data_cmap_lvl,
-                             orientation='vertical', pad=0.05, shrink=0.8
+                             orientation='horizontal', pad=0.05, shrink=0.6
                          ).set_label(colbar_label)
                 #cb.ax.tick_params(labelsize=tickfont)
                 #ticklabs = cb.ax.get_yticklabels()
@@ -523,10 +530,11 @@ def main():
     nobg  = args.nobg
     outdir = args.outdir
     cline = args.cline
+    label = args.label
 
     plot_ncparam(infile, month, param, param2=param2, meansq=meansq,
                  geocurr=geocurr, gskip=gskip, gscale=gscale, nobg=nobg,
-                 outdir=outdir, cline=cline)
+                 outdir=outdir, cline=cline, label=label)
 
 
 if __name__ == '__main__':
