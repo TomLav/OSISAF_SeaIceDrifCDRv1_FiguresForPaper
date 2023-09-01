@@ -43,8 +43,8 @@ print("Done with figure {}".format(fig_cnt))
 # Example maps free-drift parameters (1 for NH, 1 for SH)
 # =======================================================
 fig_cnt += 1
-in_file_nh = '/lustre/storeB/users/emilyjd/ice_drift_output/ice_drift_cdr/paramfiles/concatenated/freedrift_params_osi455_nh.nc'
-in_file_sh = '/lustre/storeB/users/emilyjd/ice_drift_output/ice_drift_cdr/paramfiles/concatenated/freedrift_params_osi455_sh.nc'
+in_file_nh = 'https://thredds.met.no/thredds/dodsC/osisaf/met.no/reprocessed/ice/drift_455m_files/auxiliary_files/freedrift_params_osi455_nh.nc'
+in_file_sh = 'https://thredds.met.no/thredds/dodsC/osisaf/met.no/reprocessed/ice/drift_455m_files/auxiliary_files/freedrift_params_osi455_sh.nc'
 # 1. run the notebook/script
 cmd = "python software/plot_ncparam.py -i {} -m 7 -o figs -p absA".format(in_file_nh)
 check_call(cmd, shell=True)
